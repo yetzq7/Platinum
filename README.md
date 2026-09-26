@@ -1,6 +1,10 @@
 # Platinum
+![Plat](https://i.ibb.co/yFyScbB2/platinumsigma.png)
+
 
 A fork of Erbium better than Skidium
+
+W.I.P
 
 ## Features added
 - [X] Tournament Kill/Win/Placement data (for phoenix or idk)
