@@ -1,0 +1,5 @@
+#include "pch.h"
+#include "framework.h"
+#include "./FortniteGame/Public/FortPlayerControllerAthena.h"
+#include "./FortniteGame/Public/FortPlayerStateAthena.h"
+#include "./Erbium/Public/Configuration.h"
