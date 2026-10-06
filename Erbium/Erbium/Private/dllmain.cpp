@@ -20,6 +20,19 @@
 
 void Main()
 {
+    // 1. ImageBase must be set before any finder runs
+    //    (skip this line if your code already sets it)
+    ImageBase = (uint64_t)GetModuleHandleW(nullptr);
+
+    // 2. ...your existing VersionInfo code runs here...
+
+    // 3. Must be true for engine 5.6, and set before any finder runs
+    bUE51 = VersionInfo.EngineVersion >= 5.1;
+
+    std::cout << "FortniteVersion=" << VersionInfo.FortniteVersion << " EngineVersion=" << VersionInfo.EngineVersion << " bUE51=" << bUE51 << std::endl;
+
+    // 4. Start the F9 debug thread, and nothing else
+    StartDebugThread();
 
    // BotSystem::Tick(0.1f); // or use actual delta time
 
@@ -209,6 +222,8 @@ void Main()
     {
         if (VersionInfo.FortniteVersion >= 27.00)
         {
+            if (VersionInfo.FortniteVersion >= 33.30)
+                terrainOpen = L"open Hermes_Terrain";
             if (VersionInfo.FortniteVersion >= 28.00)
                 terrainOpen = L"open Helios_Terrain";
         }

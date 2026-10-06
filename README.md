@@ -1,19 +1,17 @@
-# Platinum
+## Platinum
 ![Plat](https://i.ibb.co/yFyScbB2/platinumsigma.png)
 
+A fork of **Erbium** that aims to have better support and all the necessities for your project or just to explore!
 
-A fork of Erbium better than Skidium
+### Todo
+- [X] **Implement Vbucks on kills/wins API**
+- [ ] **Reviving**
+- [X] **Tournament Data** - 67% finished
+- [ ] **Easier Configuration (Lategame lootpools, Creative Plots, Custom Terrain, etc..)**
+- [ ] **Fixes for LTMS (Ex: Floors Lava)**
+- [ ] **IO Guards (17.30-17.50)**
 
-W.I.P
+### Planned Version Support
+- [ ] **33.30**
 
-## Features added
-- [X] Tournament Kill/Win/Placement data (for phoenix or idk)
-- [X] Vbucks on kills/Wins
-- [X] Matchmaker post (for astrid/phoenix mm or similar, also not implemented but it works)
-- [ ] Vibecoded player bots (removed)
-
-## To do
-- [ ] Bosses
-- [ ] Revives
-- [ ] Henchmen
-- [ ] Fix some weapons (Like web shooters and other)
+Remember to join the **[Erbium Discord](https://discord.com/invite/WxNEGBxfKq)**!

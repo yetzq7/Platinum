@@ -3,9 +3,15 @@
 #include "../../FortniteGame/Public/FortPlayerControllerAthena.h"
 #include <iostream>
 #include <iomanip>
+#include <algorithm>
 
-#define LOG_OFFSET(name, val) \
-    std::cout << name << ": 0x"
+#define LOG_OFFSET(name, val)                                                                                                                                                                                         \
+    do                                                                                                                                                                                                                \
+    {                                                                                                                                                                                                                 \
+        uint64_t _v = (uint64_t)(val);                                                                                                                                                                                \
+        std::cout << name << ": 0x" << std::hex << ((_v > ImageBase) ? _v - ImageBase : _v) << std::dec << (_v ? "" : "   <-- FAILED") << std::endl;                                                                  \
+    }                                                                                                                                                                                                                 \
+    while (0)
 
 uint64_t FindGIsClient()
 {
@@ -484,7 +490,7 @@ uint64_t FindTickFlush()
             auto sRef = Memcury::Scanner::FindStringRef(L"STAT_NetTickFlush", false).Get();
             if (!sRef && VersionInfo.EngineVersion == 4.20)
                 TickFlush = Memcury::Scanner::FindPattern("4C 8B DC 55 49 8D AB ? ? ? ? 48 81 EC ? ? ? ? 45 0F 29 43 ? 45 0F 29 4B ? 48 8B 05 ? ? ? ? 48").Get();
-            else
+            else if (sRef) 
                 for (int i = 0; i < 1000; i++)
                 {
                     auto Ptr = (uint8_t*)(sRef - i);
@@ -566,8 +572,9 @@ int32_t FindIsNetRelevantForVft()
             }
         }
 
-        if (IsNetRelevantForIdx == -1)
-            IsNetRelevantForIdx = 0;
+        //if (IsNetRelevantForIdx == -1)
+        //    IsNetRelevantForIdx = 0;
+        //fix claude pls aura 67
 
         LOG_OFFSET("IsNetRelevantForIdx", IsNetRelevantForIdx);
     }
@@ -4150,6 +4157,15 @@ void FindNullsAndRetTrues()
         // ue5.1+ i think, they inlined the VFT call
     }
 
+    {
+        using NT = std::remove_reference_t<decltype(NullFuncs)>::value_type;
+        using RT = std::remove_reference_t<decltype(RetTrueFuncs)>::value_type;
+        auto nBefore = NullFuncs.size(), rBefore = RetTrueFuncs.size();
+        NullFuncs.erase(std::remove(NullFuncs.begin(), NullFuncs.end(), (NT)0), NullFuncs.end());
+        RetTrueFuncs.erase(std::remove(RetTrueFuncs.begin(), RetTrueFuncs.end(), (RT)0), RetTrueFuncs.end());
+        std::cout << "Dropped " << (nBefore - NullFuncs.size()) << " null and " << (rBefore - RetTrueFuncs.size()) << " rettrue entries that failed to resolve" << std::endl;
+    }
+
     for (size_t i = 0; i < NullFuncs.size(); ++i)
     {
         LOG_OFFSET(std::string("NullFuncs[") + std::to_string(i) + "]", NullFuncs[i]);
@@ -4158,4 +4174,72 @@ void FindNullsAndRetTrues()
     {
         LOG_OFFSET(std::string("RetTrueFuncs[") + std::to_string(i) + "]", RetTrueFuncs[i]);
     }
+
+
+}
+
+static uint64_t SafeCall(uint64_t (*fn)(), const char* name)
+{
+    __try
+    {
+        return fn();
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        printf("[CRASH] %s\n", name);
+        return 0;
+    }
+}
+
+#define CHECK(fn)                                                                                                                                                                                                     \
+    do                                                                                                                                                                                                                \
+    {                                                                                                                                                                                                                 \
+        uint64_t v = SafeCall((uint64_t (*)())fn, #fn);                                                                                                                                                               \
+        std::cout << (v ? "[ OK ] " : "[FAIL] ") << #fn << std::endl;                                                                                                                                                 \
+    }                                                                                                                                                                                                                 \
+    while (0)
+
+void ValidateFinders()
+{
+    CHECK(FindGIsClient);
+    CHECK(FindGIsServer);
+    CHECK(FindGetNetMode);
+    CHECK(FindGetNamePool);
+    CHECK(FindGetWorldContext);
+    CHECK(FindCreateNetDriverWorldContext);
+    CHECK(FindInitListen);
+    CHECK(FindSetWorld);
+    CHECK(FindTickFlush);
+    CHECK(FindGetMaxTickRate);
+    CHECK(FindKickPlayer);
+    CHECK(FindEncryptionPatch);
+    CHECK(FindGameSessionPatch);
+    CHECK(FindUpdateIrisReplicationViews);
+    CHECK(FindPreSendUpdate);
+    CHECK(FindSetChannelActor);
+    CHECK(FindCreateChannel);
+    CHECK(FindReplicateActor);
+    CHECK(FindCallPreReplication);
+    CHECK(FindSendClientAdjustment);
+    CHECK(FindIsNetReady);
+    CHECK(FindFinishWorldInitialization);
+    CHECK(FindHandleMatchHasStarted);
+    CHECK(FindSetState);
+    CHECK(FindPickTeam);
+    CHECK(FindNotifyGameMemberAdded);
+    CHECK(FindApplyCharacterCustomization);
+    CHECK(FindInitializePlayerGameplayAbilities);
+    CHECK(FindGiveAbility);
+    CHECK(FindConstructAbilitySpec);
+    CHECK(FindInternalTryActivateAbility);
+    CHECK(FindGiveAbilityAndActivateOnce);
+    CHECK(FindSetGamePhase);
+    CHECK(FindStartAircraftPhase);
+    CHECK(FindInitializeFlightPath);
+    CHECK(FindEnterAircraft);
+    CHECK(FindSpawnInitialSafeZone);
+    CHECK(FindUpdateSafeZonesPhase);
+    CHECK(FindHandlePostSafeZonePhaseChanged);
+    CHECK(FindRemoveFromAlivePlayers);
+    FindNullsAndRetTrues();
 }

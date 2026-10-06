@@ -8,6 +8,102 @@
 #include "../Public/Configuration.h"
 #include "../Public/Finders.h"
 #include <algorithm>
+#include <fstream>
+#include <iostream>
+
+void DumpNamePool()
+{
+    auto Pool = (uint8_t*)(ImageBase + 0x163C2B68);
+    if (IsBadReadPtr(Pool, 0x80))
+    {
+        std::cout << "Pool address unreadable" << std::endl;
+        return;
+    }
+
+    std::cout << "Pool bytes:";
+    for (int i = 0; i < 0x80; i++)
+    {
+        if (i % 16 == 0)
+            std::cout << "\n";
+        printf("%02X ", Pool[i]);
+    }
+    std::cout << std::endl;
+
+    auto Block0 = *(uint8_t**)(Pool + 0x10);
+    std::cout << "Blocks[0] = " << (void*)Block0 << std::endl;
+    if (!Block0 || IsBadReadPtr(Block0, 0x40))
+    {
+        std::cout << "Blocks[0] unreadable" << std::endl;
+        return;
+    }
+
+    std::cout << "Block0 bytes:";
+    for (int i = 0; i < 0x40; i++)
+    {
+        if (i % 16 == 0)
+            std::cout << "\n";
+        printf("%02X ", Block0[i]);
+    }
+    std::cout << "\nAs text: ";
+    for (int i = 0; i < 0x40; i++)
+        std::cout << (Block0[i] >= 0x20 && Block0[i] < 0x7F ? (char)Block0[i] : '.');
+    std::cout << std::endl;
+
+    auto fn = FindGetNamePool();
+    for (int i = 0; fn && i < 0x40; i++)
+    {
+        auto p = (uint8_t*)(fn + i);
+        if (p[0] == 0x48 && p[1] == 0x8D && p[2] == 0x05)
+            std::cout << "lea target RVA: 0x" << std::hex << (Memcury::Scanner(p).RelativeOffset(3).Get() - ImageBase) << std::dec << std::endl;
+    }
+}
+
+void DumpVft(const char* ClassName, int Count = 0x120)
+{
+    auto Obj = DefaultObjImpl(ClassName);
+    if (!Obj)
+    {
+        std::cout << "No default obj for " << ClassName << std::endl;
+        return;
+    }
+    std::ofstream f(std::string("vft_") + ClassName + ".txt");
+    for (int i = 0; i < Count; i++)
+    {
+        auto p = (uint64_t)Obj->Vft[i];
+        if (!p || p < ImageBase)
+            break;
+        f << std::dec << i << ": 0x" << std::hex << (p - ImageBase) << "\n";
+    }
+}
+
+void DumpVfts()
+{
+    DumpVft("NetDriver");
+    DumpVft("FortGameModeAthena");
+    DumpVft("FortPlayerControllerAthena");
+    DumpVft("FortGameStateAthena");
+}
+
+void StartDebugThread()
+{
+    CreateThread(0, 0, [](LPVOID) -> DWORD
+    {
+        while (true)
+        {
+            if (GetAsyncKeyState(VK_F9) & 1)
+            {
+                std::cout << "=== ValidateFinders ===" << std::endl;
+                ValidateFinders();
+                std::cout << "=== DumpNamePool ===" << std::endl;
+                DumpNamePool();
+                std::cout << "=== DumpVfts ===" << std::endl;
+                DumpVfts();
+                std::cout << "=== done ===" << std::endl;
+            }
+            Sleep(50);
+        }
+    }, 0, 0, 0);
+}
 
 int Misc::GetNetMode()
 {

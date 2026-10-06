@@ -124,4 +124,5 @@ CVarT* FindCVar(const wchar_t* CVarStr)
 inline std::vector<uint64_t> NullFuncs = {};
 inline std::vector<uint64_t> RetTrueFuncs = {};
 
+void ValidateFinders();
 void FindNullsAndRetTrues();

@@ -3,8 +3,8 @@
 struct FConfiguration
 {
  //static inline auto Playlist = L"/Game/Athena/Playlists/Showdown/Playlist_ShowdownAlt_Solo.Playlist_ShowdownAlt_Solo";
-//  static inline auto Playlist = L"/Game/Athena/Playlists/Creative/Playlist_PlaygroundV2.Playlist_PlaygroundV2";
-  static inline auto Playlist = L"/Game/Athena/Playlists/Playlist_DefaultSolo.Playlist_DefaultSolo";
+ // static inline auto Playlist = L"/BRPlaylists/Athena/Playlists/Playlist_DefaultSolo.Playlist_DefaultSolo";
+ static inline auto Playlist = L"/Game/Athena/Playlists/Playlist_DefaultSolo.Playlist_DefaultSolo";
 
     static inline auto MaxTickRate = 120;
     static inline auto bLateGame = false;
@@ -16,7 +16,7 @@ struct FConfiguration
     static inline auto PregameMats = false; // pretty ass for now
 
     static inline constexpr auto ApiKey = "platinum"; // backend api key (reload/phoenix/better reload or any reload fork ig)
-    static inline constexpr auto VbucksAPI = "http://127.0.0.1:6767/api/reload/vbucks"; // for vb on kills n wins
+    static inline constexpr auto VbucksAPI = "http://127.0.0.1:6767/api/skid/vbucks"; // for vb on kills n wins
 
     // tournament stuff
     // only if enabletournaments is set to true on Better Phoenix
@@ -36,11 +36,11 @@ struct FConfiguration
     static inline auto bInfiniteAmmo = false;
     static inline auto bForceRespawns = false; // build your client with this too!
     static inline auto bJoinInProgress = false;
-    static inline auto bAutoRestart = true;
+    static inline auto bAutoRestart = false;
     static inline auto bKeepInventory = false;
     static inline auto Port = 7777;
     static inline auto bEnableIris = true;
-    static inline constexpr auto bGUI = true;
+    static inline constexpr auto bGUI = false;
     static inline constexpr auto bCustomCrashReporter = true;
     static inline constexpr auto bUseStdoutLog = true;
     static inline constexpr auto WebhookURL = ""; // fill in if you want status to send to a webhook
@@ -54,4 +54,8 @@ class Bosses
   //  constexpr static bool bS13 = false;
 
     private:
+};
+
+class LategameLoot
+{
 };
